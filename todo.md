@@ -4,21 +4,19 @@
 **Goal:** Implement CRUD operations, health tracking logic, and integration with the ML model.
 
 - [X] Set up a FastAPI/Flask project structure.  
-- [ ] Implement user authentication (optional for a toy project).  
-- [ ] Create endpoints for CRUD operations on health metrics:  
+- [X] Create endpoints for CRUD operations on health metrics:  
   - POST `/health-metrics`: Add daily health logs.  
   - GET `/health-metrics`: Fetch all user logs.  
-  - PUT `/health-metrics/{id}`: Update a specific log.  
   - DELETE `/health-metrics/{id}`: Delete a specific log.  
-- [ ] Add an endpoint to fetch ML predictions for uploaded health data:  
+- [X] Add an endpoint to fetch ML predictions for uploaded health data:  
   - POST `/predict-wellness`: Sends data to the ML model for predictions.  
-- [ ] Set up a connection to the database (Azure SQL or SQLite for simplicity).  
+- [X] Set up a connection to the database (Azure SQL or SQLite for simplicity).  
 - [ ] Add basic logging for API requests and errors.  
 
 ## 2 - Frontend  
 **Goal:** Create a simple dashboard for users to log and view their health metrics, predictions, and cost monitoring.
 
-- [X] Set up a React project.  
+- [ ] Set up a React project.  
 - [ ] Create a form to submit health data (steps, calories, sleep hours).  
 - [ ] Create a table or card layout to display submitted health metrics.  
 - [ ] Add a section to display wellness score predictions.  
@@ -29,16 +27,16 @@
 **Goal:** Train a simple model to predict wellness scores and deploy it to Azure ML.
 
 - [X] Set up a Python project with dependencies (use `requirements.txt` or Poetry).  
-- [ ] Prepare a synthetic dataset with fields: `steps`, `calories`, `sleep_hours`, and `wellness_score`.  
-- [ ] Train a regression model (e.g., Random Forest or Linear Regression) to predict `wellness_score`.  
-- [ ] Save the trained model and test predictions locally.  
+- [X] Prepare a synthetic dataset with fields: `steps`, `calories`, `sleep_hours`, and `wellness_score`.  
+- [X] Train a regression model (e.g., Random Forest or Linear Regression) to predict `wellness_score`.  
+- [X] Save the trained model and test predictions locally.  
 - [ ] Deploy the model to Azure ML as a REST endpoint.  
 - [ ] Test the deployed endpoint using sample data.  
 
 ## 4 - Terraform Code  
 **Goal:** Automate infrastructure setup for the project.
 
-- [X] Initialize a Terraform project.  
+- [ ] Initialize a Terraform project.  
 - [ ] Write Terraform scripts to provision the following resources:  
   - Azure App Service for the backend.  
   - Azure SQL Database for storing user data.  

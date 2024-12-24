@@ -1,12 +1,59 @@
+import joblib
+import numpy as np
 from fastapi import Depends, FastAPI
 from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
+
 from backend.database.handler.db import get_db
+from backend.database.models.models import Metric, User
 from backend.models.metrics import Metrics
 from backend.models.user import User as UserModel
-from backend.database.models.models import User, Metric
+
+
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Vite's default port
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+model_path = "random_forest_wellness_model.pkl"
+model = joblib.load(model_path)
+
+
+@app.post("/predict-wellness/{metric_id}")
+async def predict_wellness(email: str, metric_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == email).first()
+    if user:
+        try:
+            metrics = db.query(Metric).filter(Metric.user_id == user.id).first()
+            features = np.array(
+                [[metrics.steps, metrics.calories, metrics.sleep_hours]]
+            )
+            pred = model.predict(features)[0]
+            if not metrics:
+                raise HTTPException(
+                    status_code=404, detail="No health metrics found for the user"
+                )
+            try:
+                metrics.wellness_score = pred
+                db.commit()
+                return {"pred": pred}
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Error: {e}")
+                db.rollback()
+        except HTTPException as e:
+            return {"Error": e}
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
 
 
 @app.get("/health_metrics/{email}")
@@ -107,8 +154,3 @@ async def create_user(usr: UserModel, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         return {"error": f"An error occurred: {e!s}"}
-
-
-@app.get("/home")
-async def root() -> dict:
-    return {"message": "hello world"}
