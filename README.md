@@ -9,5 +9,7 @@ for now, the core features are focused around :
    - A FastAPI backend for the endpoints
    - IaC with terraform
    - Alerting TBD
+
+
 The services will be determined on the go. 
 
