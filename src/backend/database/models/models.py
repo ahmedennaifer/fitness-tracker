@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, declarative_base
+
 
 Base = declarative_base()
 
@@ -15,7 +15,6 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # Relationship
     metrics = relationship("Metric", back_populates="user")
 
 
@@ -28,7 +27,6 @@ class Metric(Base):
     steps = Column(Integer, nullable=False, comment="Number of steps taken")
     calories = Column(Integer, nullable=False, comment="Calories consumed")
     sleep_hours = Column(Float, nullable=False, comment="Hours of sleep")
-    wellness_score = Column(Float, nullable=False, comment="Calculated wellness score")
+    wellness_score = Column(Float, nullable=True, comment="Calculated wellness score")
 
-    # Relationship
     user = relationship("User", back_populates="metrics")
