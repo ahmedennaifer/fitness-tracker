@@ -7,7 +7,7 @@ from backend.database.models.models import User, Metric, Base
 print(User, Metric)
 
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Directory of db.py
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  
 DATABASE_PATH = os.path.join(BASE_DIR, "fitness_tracker.db")
 DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
 
