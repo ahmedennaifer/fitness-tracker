@@ -10,6 +10,19 @@ from backend.database.models.models import User, Metric
 app = FastAPI()
 
 
+@app.get("/health_metrics/{email}")
+async def get_health_metrics(email: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == email).first()
+    if user:
+        try:
+            metrics = db.query(Metric).filter(Metric.user_id == user.id).first()
+            return {"metrics": metrics.__dict__}
+        except HTTPException as e:
+            return {"Error": e}
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
+
+
 @app.post("/health_metrics/{email}")
 async def send_health_metrics(
     metrics: Metrics, email: str, db: Session = Depends(get_db)
