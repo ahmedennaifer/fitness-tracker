@@ -1,20 +1,20 @@
+import os
 from sqlalchemy import create_engine  # noqa: I001
 from sqlalchemy.orm import sessionmaker
-from backend.database.models.models import (
-    User,
-    Metric,
-    Base,
-)
+from backend.database.models.models import User, Metric, Base
 
-print(Metric.__base__)
 
-DATABASE_URL = "sqlite:///fitness_tracker.db"
+print(User, Metric)
+
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Directory of db.py
+DATABASE_PATH = os.path.join(BASE_DIR, "fitness_tracker.db")
+DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
+
 
 engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base = User.__bases__[0]
 
 
 def create_tables():
@@ -28,3 +28,11 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+if __name__ == "__main__":
+    from backend.database.models.models import User
+
+    with next(get_db()) as db:  # Extract the session
+        users = db.query(User).all()
+        print("Users:", users)
