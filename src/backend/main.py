@@ -25,7 +25,7 @@ app.add_middleware(
 )
 
 
-model_path = "random_forest_wellness_model.pkl"
+model_path = "weights/random_forest_wellness_model.pkl"
 model = joblib.load(model_path)
 
 

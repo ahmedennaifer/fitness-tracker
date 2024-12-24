@@ -16,12 +16,11 @@
 ## 2 - Frontend  
 **Goal:** Create a simple dashboard for users to log and view their health metrics, predictions, and cost monitoring.
 
-- [ ] Set up a React project.  
-- [ ] Create a form to submit health data (steps, calories, sleep hours).  
-- [ ] Create a table or card layout to display submitted health metrics.  
-- [ ] Add a section to display wellness score predictions.  
+- [X] Set up a React project.  
+- [X] Create a form to submit health data (steps, calories, sleep hours).  
+- [X] Create a table or card layout to display submitted health metrics.  
+- [X] Add a section to display wellness score predictions.  
 - [ ] Create a section to show ML run history (mocked initially).  
-- [ ] Add a basic cost monitoring display.  
 
 ## 3 - Machine Learning (ML)  
 **Goal:** Train a simple model to predict wellness scores and deploy it to Azure ML.
@@ -47,7 +46,7 @@
 ## 5 - CI/CD Pipeline with Azure DevOps  
 **Goal:** Automate deployment of backend, frontend, and ML updates.
 
-- [X] Create an Azure DevOps project.  
+- [ ] Create an Azure DevOps project.  
 - [ ] Set up a pipeline for backend deployment:  
   - Linting and testing with pytest.  
   - Build and deploy the FastAPI/Flask app to Azure App Service.  
