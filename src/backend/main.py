@@ -1,7 +1,6 @@
 from fastapi import Depends, FastAPI
 from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
-
 from backend.database.handler.db import get_db
 from backend.models.metrics import Metrics
 from backend.models.user import User as UserModel
@@ -16,6 +15,11 @@ async def get_health_metrics(email: str, db: Session = Depends(get_db)):
     if user:
         try:
             metrics = db.query(Metric).filter(Metric.user_id == user.id).first()
+            if not metrics:
+                raise HTTPException(
+                    status_code=404, detail="No health metrics found for the user"
+                )
+
             return {"metrics": metrics.__dict__}
         except HTTPException as e:
             return {"Error": e}
@@ -46,6 +50,50 @@ async def send_health_metrics(
     except Exception as e:
         db.rollback()
         return {"error" f"An error occured {e}"}
+
+
+@app.delete("/health_metrics/{email}/{steps}")
+async def delete_health_metrics_by_n_steps(
+    steps: int, email: str, db: Session = Depends(get_db)
+):
+    user = db.query(User).filter(User.email == email).first()
+    if user:
+        try:
+            metrics = db.query(Metric).filter(Metric.steps == steps).first()
+
+            if not metrics:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"No health metrics found for the user with {steps} steps",
+                )
+            db.delete(metrics)
+            db.commit()
+            return {"message": f"Metrics with id {metrics.id} deleted! "}
+        except HTTPException as e:
+            return {"Error": e}
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
+
+
+@app.delete("/health_metrics/{email}")
+async def delete_health_metrics(email: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == email).first()
+    if user:
+        try:
+            metrics = db.query(Metric).filter(Metric.user_id == user.id).all()
+
+            if not metrics:
+                raise HTTPException(
+                    status_code=404, detail="No health metrics found for the user"
+                )
+            for metric in metrics:
+                db.delete(metric)
+            db.commit()
+            return {"message": f"Metrics with id {metrics.id} deleted! "}
+        except HTTPException as e:
+            return {"Error": e}
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
 
 
 @app.post("/create_user")
