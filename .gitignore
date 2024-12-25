@@ -5,7 +5,8 @@
 # Logs
 
 
-
+src/frontend/wellness-frontend/node_modules/
+src/frontend/wellness-frontend/node_modules
 .terraform/
 *.tfstate
 *.tfstate.backup
