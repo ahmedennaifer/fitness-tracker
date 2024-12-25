@@ -1,7 +1,7 @@
 import os
 from sqlalchemy import create_engine  # noqa: I001
 from sqlalchemy.orm import sessionmaker
-from src.backend.database.models.models import User, Metric, Base
+from backend.database.models.models import User, Metric, Base
 
 
 print(User, Metric)
