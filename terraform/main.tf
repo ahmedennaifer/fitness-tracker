@@ -1,29 +1,43 @@
 terraform {
   required_providers {
     azurerm = {
-      source = "hashicorp/azurerm"
+      source  = "hashicorp/azurerm"
+      version = "~> 3.70.0"
     }
   }
 }
 
 provider "azurerm" {
-  features {}
-  subscription_id = "ca753a19-5893-402b-9913-618a3af09d86"
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
+  skip_provider_registration = true
+  subscription_id            = "ca753a19-5893-402b-9913-618a3af09d86"
 }
 
 resource "azurerm_resource_group" "rg" {
   name     = "fitness-tracker-rg"
-  location = "eastus2"
+  location = "North Europe"
 }
 
 resource "azurerm_mssql_server" "sql" {
+
+
   name                         = "fitness-sql-001"
   resource_group_name          = azurerm_resource_group.rg.name
-  location                     = azurerm_resource_group.rg.location
+  location                     = "North Europe"
   version                      = "12.0"
   administrator_login          = "sqladmin"
   administrator_login_password = "Testmdp1!"
   depends_on                   = [azurerm_resource_group.rg]
+
+  lifecycle {
+    ignore_changes = [
+      connection_policy
+    ]
+  }
 }
 
 resource "azurerm_mssql_database" "db" {
@@ -35,7 +49,6 @@ resource "azurerm_mssql_database" "db" {
   sku_name     = "Basic"
   depends_on   = [azurerm_mssql_server.sql]
 }
-
 
 resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
   name             = "AllowAzureServices"
@@ -49,21 +62,27 @@ resource "azurerm_service_plan" "plan" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   os_type             = "Linux"
-  sku_name            = "B1"
+  sku_name            = "F1"
 }
 
+
+
+
 resource "azurerm_linux_web_app" "api" {
-  name                = "fitness-api-001"
+  name                = "fitness-api-backed-001-pls-work-im-tired"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   service_plan_id     = azurerm_service_plan.plan.id
 
   site_config {
+    always_on = false
     application_stack {
       python_version = "3.10"
     }
   }
 }
+
+
 
 # resource "azurerm_static_web_app" "frontend" {
 #   name                = "fitness-app-frontend-001"
