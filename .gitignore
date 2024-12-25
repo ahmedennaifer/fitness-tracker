@@ -3,6 +3,13 @@
 
 ### Node ###
 # Logs
+
+
+
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
 logs
 *.log
 npm-debug.log*
@@ -564,4 +571,3 @@ sketch
 # End of https://www.toptal.com/developers/gitignore/api/react,node,python
 /terraform/.terraform/
 /venv/
-/weights/*.pkl
