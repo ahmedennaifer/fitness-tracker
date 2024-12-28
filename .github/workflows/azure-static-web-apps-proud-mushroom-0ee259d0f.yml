@@ -29,7 +29,7 @@ jobs:
           app_location: "src/frontend/wellness-frontend"
           api_location: "src/backend"
           app_build_command: "npm run build"
-          output_location: "dist"  # Change from 'build' to 'dist' for Vite
+          output_location: "dist" 
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'

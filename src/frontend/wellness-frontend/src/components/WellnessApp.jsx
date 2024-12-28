@@ -219,9 +219,18 @@ const MetricsPage = () => {
 
   const handleDelete = async () => {
     try {
-      await fetch(`${API_URL}/health_metrics/${userEmail}`, {
-        method: 'DELETE'
+      const response = await fetch(`${API_URL}/health_metrics/${userEmail}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'  
       });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
       setMessage('Metrics deleted successfully');
       setWellnessScore(null);
       setMetrics({
@@ -235,7 +244,6 @@ const MetricsPage = () => {
       setMessage('Error deleting metrics. Please try again.');
     }
   };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-8">
       <div className="container-fluid px-4">
