@@ -22,6 +22,7 @@ steps:
 
 - script: |
     export PYTHONPATH=$PYTHONPATH:$(pwd)/src
+    source venv/bin/activate
     cd src/backend
     python -m pytest tests/ --cov=. --cov-report=xml --cov-report=html
   displayName: 'Run tests'
