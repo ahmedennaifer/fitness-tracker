@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import { Activity, User, Moon, Trash2 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+
+
+
+const API_URL = "https://fitness-api-backed-001-ahmed2.azurewebsites.net"
+
+
 const Navbar = ({ setCurrentPage, currentPage }) => (
   <nav className="bg-white shadow-sm">
     <div className="container-fluid px-4">
@@ -38,7 +44,7 @@ const RegisterPage = ({ onNavigate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/create_user', {
+      const response = await fetch(`${API_URL}/create_user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -50,7 +56,8 @@ const RegisterPage = ({ onNavigate }) => {
         setTimeout(() => onNavigate('metrics'), 1500);
       }
     } catch (error) {
-      setMessage('Error creating account');
+      console.error('Error:', error);
+      setMessage('Error creating account. Please try again.');
     }
   };
 
@@ -167,13 +174,14 @@ const MetricsPage = () => {
   const fetchMetrics = async () => {
     if (!userEmail) return;
     try {
-      const response = await fetch(`http://localhost:8000/health_metrics/${userEmail}`);
+      const response = await fetch(`${API_URL}/health_metrics/${userEmail}`);
       const data = await response.json();
       if (data.metrics) {
         setHistoricalMetrics(data.metrics);
       }
     } catch (error) {
       console.error('Error fetching metrics:', error);
+      setMessage('Error fetching metrics. Please try again.');
     }
   };
 
@@ -187,16 +195,16 @@ const MetricsPage = () => {
       setMessage('Please register first');
       return;
     }
-
+  
     try {
-      const response = await fetch(`http://localhost:8000/health_metrics/${userEmail}`, {
+      const response = await fetch(`${API_URL}/health_metrics/${userEmail}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(metrics)
       });
       const data = await response.json();
-
-      const predResponse = await fetch(`http://localhost:8000/predict-wellness/1?email=${userEmail}`, {
+  
+      const predResponse = await fetch(`${API_URL}/predict-wellness/1?email=${userEmail}`, {
         method: 'POST'
       });
       const predData = await predResponse.json();
@@ -204,13 +212,14 @@ const MetricsPage = () => {
       setMessage('Metrics submitted successfully');
       fetchMetrics();
     } catch (error) {
-      setMessage('Error submitting metrics');
+      console.error('Error:', error);
+      setMessage('Error submitting metrics. Please try again.');
     }
   };
 
   const handleDelete = async () => {
     try {
-      await fetch(`http://localhost:8000/health_metrics/${userEmail}`, {
+      await fetch(`${API_URL}/health_metrics/${userEmail}`, {
         method: 'DELETE'
       });
       setMessage('Metrics deleted successfully');
@@ -222,7 +231,8 @@ const MetricsPage = () => {
       });
       setHistoricalMetrics([]);
     } catch (error) {
-      setMessage('Error deleting metrics');
+      console.error('Error:', error);
+      setMessage('Error deleting metrics. Please try again.');
     }
   };
 
