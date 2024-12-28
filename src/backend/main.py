@@ -180,7 +180,7 @@ async def delete_health_metrics_by_n_steps(
             db.delete(metrics)
             db.commit()
             logger.error("Info deleted!")
-            return {"message": f"Metrics with id {metrics.id} deleted! "}
+            return {"message": f"Metrics for user {email} deleted! "}
         except HTTPException as e:
             return {"Error": e}
     else:
