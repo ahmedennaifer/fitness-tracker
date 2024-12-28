@@ -37,10 +37,9 @@ logger.setLevel(logging.INFO)
 
 app = FastAPI()
 
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["https://white-bush-008dced1e.4.azurestaticapps.net"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
