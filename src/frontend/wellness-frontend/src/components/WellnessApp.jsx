@@ -106,10 +106,6 @@ const RegisterPage = ({ onNavigate }) => {
               </div>
             </div>
           </div>
-          
-
-
-                  
 
           {/* Right Column */}
           <div className="lg:pl-12 w-full">
@@ -396,9 +392,6 @@ const MetricsPage = () => {
               )}
             </div>
           </div>
-
-            
-
         </div>
       </div>
     </div>
