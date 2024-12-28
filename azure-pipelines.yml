@@ -1,101 +1,41 @@
-# Python to Linux Web App on Azure
-# Build your Python project and deploy it to Azure as a Linux Web App.
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
-
 trigger:
-- main   # or add other branches as needed
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
 
 variables:
-  # Azure Resource Manager connection (service connection name/ID)
-  azureServiceConnectionId: '3521fdb8-03cb-4ee2-b578-8983c8c3b7a8'
+  pythonVersion: '3.10'
 
-  # Web app name
-  webAppName: 'fitness-api-backed-001-pls-work-im-tired'
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(pythonVersion)'
+    addToPath: true
+  displayName: 'Use Python $(pythonVersion)'
 
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+    pip install pytest pytest-cov
+  displayName: 'Install dependencies'
 
-  # Environment name (for Azure DevOps environment tracking)
-  environmentName: 'fitness-api-backed-001-pls-work-im-tired'
+- script: |
+    export PYTHONPATH=$PYTHONPATH:$(pwd)/src
+    cd src/backend
+    python -m pytest tests/ --cov=. --cov-report=xml --cov-report=html
+  displayName: 'Run tests'
 
-  # Project root folder (the directory containing your code, requirements.txt, etc.)
-  projectRoot: '$(System.DefaultWorkingDirectory)'
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/src/backend/coverage.xml'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/src/backend/htmlcov'
 
-  # Python version to use
-  pythonVersion: '3.10.14'
-
-stages:
-# ------------------------------------------------------------------------------
-# 1) BUILD & TEST FASTAPI (or other Python) BACKEND
-# ------------------------------------------------------------------------------
-- stage: Build
-  displayName: "Build & Test Stage"
-  jobs:
-    - job: BuildJob
-      displayName: "Build & Test FastAPI"
-      pool:
-        vmImage: $(vmImageName)
-      steps:
-      - task: Checkout@1
-        displayName: "Checkout code"
-
-      - task: UsePythonVersion@0
-        displayName: "Set up Python $(pythonVersion)"
-        inputs:
-          versionSpec: '$(pythonVersion)'
-
-      - script: |
-          python -m venv antenv
-          source antenv/bin/activate
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pytest  # <-- run tests here
-        workingDirectory: $(projectRoot)
-        displayName: "Install requirements & Run tests"
-
-      - task: ArchiveFiles@2
-        displayName: "Archive files"
-        inputs:
-          rootFolderOrFile: '$(projectRoot)'
-          includeRootFolder: false
-          archiveType: zip
-          archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-          replaceExistingArchive: true
-
-      - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-        displayName: "Upload package artifact"
-        artifact: drop
-
-# ------------------------------------------------------------------------------
-# 2) DEPLOY PYTHON BACKEND TO AZURE WEB APP
-# ------------------------------------------------------------------------------
-- stage: Deploy
-  displayName: "Deploy Stage"
-  dependsOn: Build
-  condition: succeeded()  # Only run if build & tests succeeded
-  jobs:
-    - deployment: DeploymentJob
-      displayName: "Deploy to Azure Web App"
-      pool:
-        vmImage: $(vmImageName)
-      environment: $(environmentName)
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - task: UsePythonVersion@0
-              displayName: "Set up Python $(pythonVersion)"
-              inputs:
-                versionSpec: '$(pythonVersion)'
-
-            - task: AzureWebApp@1
-              displayName: "Deploy to Azure Web App: $(webAppName)"
-              inputs:
-                # This must be the *name* of your service connection, not just a GUID, if Azure DevOps expects a friendly name.
-                # If your service connection name is actually the GUID, this is fine. Otherwise, replace with your service connection's friendly name.
-                azureSubscription: '$(azureServiceConnectionId)'
-
-                appName: '$(webAppName)'
-
-                # Deploy the artifact from the previous stage
-                package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+- task: AzureWebApp@1
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  inputs:
+    azureSubscription: 'fitness-tracker-connection'
+    appName: 'fitness-api-backed-001-ahmed2'
+    package: '$(System.DefaultWorkingDirectory)'
+    startUpCommand: 'uvicorn backend.main:app --host 0.0.0.0 --port 8000'
