@@ -3,13 +3,16 @@ from sqlalchemy import create_engine  # noqa: I001
 from sqlalchemy.orm import sessionmaker
 from backend.database.models.models import User, Metric, Base
 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 print(User, Metric)
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE_PATH = os.path.join(BASE_DIR, "fitness_tracker.db")
-DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
+DATABASE_URL = os.environ["DB_PATH"]
 
 
 engine = create_engine(DATABASE_URL)

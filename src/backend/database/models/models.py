@@ -9,12 +9,10 @@ Base = declarative_base()
 
 class User(Base):
     __tablename__ = "users"
-
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    email = Column(String, unique=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
-
+    name = Column(String(100), nullable=False)
+    email = Column(String(255), nullable=False, unique=True)
     metrics = relationship("Metric", back_populates="user")
 
 
