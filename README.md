@@ -8,8 +8,9 @@ for now, the core features are focused around :
    - A chatgpt generated frontend.
    - A FastAPI backend for the endpoints
    - IaC with terraform
-   - Alerting TBD
+   - Monitoring with App insights
+   - Alerting for >5s response times
 
-
+![Diagram](images/fitness-app.png)
 The services will be determined on the go. 
 
