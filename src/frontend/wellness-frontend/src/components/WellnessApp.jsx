@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Activity, User, Moon, Trash2 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+
+
+
 const API_URL = "https://fitness-api-backed-001-ahmed2.azurewebsites.net"
+
 
 const Navbar = ({ setCurrentPage, currentPage }) => (
   <nav className="bg-white shadow-sm">
@@ -103,6 +107,10 @@ const RegisterPage = ({ onNavigate }) => {
             </div>
           </div>
           
+
+
+                  
+
           {/* Right Column */}
           <div className="lg:pl-12 w-full">
             <div className="bg-white rounded-xl shadow-lg p-8">
@@ -154,7 +162,7 @@ const RegisterPage = ({ onNavigate }) => {
       </div>
     </div>
   );
-}; // <-- Close MetricsPage here
+};
 
 const MetricsPage = () => {
   const [metrics, setMetrics] = useState({
@@ -181,7 +189,7 @@ const MetricsPage = () => {
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchMetrics();
   }, [userEmail]);
 
@@ -240,7 +248,6 @@ const MetricsPage = () => {
       setMessage('Error deleting metrics. Please try again.');
     }
   };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-8">
       <div className="container-fluid px-4">
@@ -317,14 +324,87 @@ const MetricsPage = () => {
             </div>
           </div>
 
-          {/* You can add the right column or other components here if needed */}
+   
+{/* Right Column */}
+          <div className="space-y-8 w-full">
+            {wellnessScore !== null && (
+              <div className="bg-white rounded-xl shadow-lg p-8">
+                <h3 className="text-2xl font-semibold mb-6">Current Wellness Score</h3>
+                <div className="bg-blue-50 rounded-lg p-8 text-center">
+                  <div className="text-6xl font-bold text-blue-600">
+                    {wellnessScore.toFixed(1)}
+                  </div>
+                  <div className="text-gray-600 mt-2">out of 100</div>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-white rounded-xl shadow-lg p-8">
+              <h3 className="text-2xl font-semibold mb-6">Activity Summary</h3>
+              <div className="grid grid-cols-2 gap-8 w-full">
+                <div className="text-center p-6 bg-gray-50 rounded-lg">
+                  <div className="text-gray-600 mb-2">Sleep Duration</div>
+                  <div className="text-3xl font-bold text-gray-900">{metrics.sleep_hrs || '0'}h</div>
+                </div>
+                <div className="text-center p-6 bg-gray-50 rounded-lg">
+                  <div className="text-gray-600 mb-2">Daily Steps</div>
+                  <div className="text-3xl font-bold text-gray-900">{metrics.steps || '0'}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg p-8">
+              <h3 className="text-2xl font-semibold mb-6">Historical Metrics</h3>
+              {historicalMetrics && (
+                <div className="space-y-4">
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={[historicalMetrics]}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="timestamp" />
+                        <YAxis />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="steps" stroke="#3B82F6" name="Steps" />
+                        <Line type="monotone" dataKey="calories" stroke="#10B981" name="Calories" />
+                        <Line type="monotone" dataKey="sleep_hours" stroke="#8B5CF6" name="Sleep Hours" />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="bg-blue-50 p-4 rounded-lg text-center">
+                        <div className="text-sm text-gray-600">Avg Steps</div>
+                        <div className="text-xl font-bold text-gray-900">
+                          {historicalMetrics.steps || 0}
+                        </div>
+                      </div>
+                      <div className="bg-green-50 p-4 rounded-lg text-center">
+                        <div className="text-sm text-gray-600">Avg Calories</div>
+                        <div className="text-xl font-bold text-gray-900">
+                          {historicalMetrics.calories_burnt_per_day || 0}
+                        </div>
+                      </div>
+                      <div className="bg-purple-50 p-4 rounded-lg text-center">
+                        <div className="text-sm text-gray-600">Avg Sleep</div>
+                        <div className="text-xl font-bold text-gray-900">
+                          {historicalMetrics.sleep_hrs || 0}h
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+            
+
         </div>
       </div>
     </div>
   );
-}; // <-- Close MetricsPage component here
+};
 
-// Define the main WellnessApp component
 const WellnessApp = () => {
   const [currentPage, setCurrentPage] = useState('register');
 
@@ -340,3 +420,8 @@ const WellnessApp = () => {
 };
 
 export default WellnessApp;
+
+
+
+
+
