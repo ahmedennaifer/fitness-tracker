@@ -4,38 +4,14 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-variables:
-  pythonVersion: '3.10'
-
 steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(pythonVersion)'
-    addToPath: true
-  displayName: 'Use Python $(pythonVersion)'
-
 - script: |
-    python -m pip install --upgrade pip
-    pip install -r requirements.txt
-    pip install pytest pytest-cov pytest-asyncio fastapi httpx sqlalchemy fastapi-sqlalchemy python-jose[cryptography] passlib[bcrypt] python-multipart
-  displayName: 'Install dependencies'
-
-#- script: |
-#  export PYTHONPATH=$PYTHONPATH:$(pwd)/src
-#   cd src/backend
-#   python -m pytest tests/ --cov=. --cov-report=xml --cov-report=html -v
-# displayName: 'Run tests'
-
-- task: PublishCodeCoverageResults@1
-  inputs:
-    codeCoverageTool: Cobertura
-    summaryFileLocation: '$(System.DefaultWorkingDirectory)/src/backend/coverage.xml'
-    reportDirectory: '$(System.DefaultWorkingDirectory)/src/backend/htmlcov'
+    chmod +x startup.sh
+  displayName: 'Make startup script executable'
 
 - task: AzureWebApp@1
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   inputs:
     azureSubscription: 'fitness-tracker-connection'
     appName: 'fitness-api-backed-001-ahmed2'
     package: '$(System.DefaultWorkingDirectory)'
-    startUpCommand: 'uvicorn backend.main:app --host 0.0.0.0 --port 8000'
+    startUpCommand: './startup.sh'
