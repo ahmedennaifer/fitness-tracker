@@ -35,7 +35,14 @@ steps:
       ls -la
     displayName: 'Extra checks and logs'
 
-
+  - script: |
+      which python
+      python --version
+      pip list
+      python -m site
+    displayName: 'Debug Python Environment'
+    
+    
   - task: AzureWebApp@1
     inputs:
       azureSubscription: 'fitness-tracker-connection'
