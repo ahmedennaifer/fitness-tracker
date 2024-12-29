@@ -33,7 +33,6 @@ steps:
       cd src
       echo "Changed directory"
       ls -la
-      uvicorn backend.main:app --host 0.0.0.0 --port 8000
     displayName: 'Run Backend'
 
 
