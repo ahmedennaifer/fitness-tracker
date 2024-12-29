@@ -42,6 +42,14 @@ steps:
       python -m site
     displayName: 'Debug Python Environment'
     
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: '$(System.DefaultWorkingDirectory)'
+      Contents: |
+        requirements.txt
+        src/**
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      CleanTargetFolder: true
     
   - task: AzureWebApp@1
     inputs:
