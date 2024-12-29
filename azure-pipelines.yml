@@ -42,3 +42,13 @@ steps:
       azureSubscription: 'fitness-tracker-connection'
       appName: 'fitness-api-backed-001-ahmed2'
       package: '$(System.DefaultWorkingDirectory)'
+      appSettings: |
+        APP_INSIGHTS_KEY=$(APP_INSIGHTS_KEY)
+        AZURE_ML_ENDPOINT=$(AZURE_ML_ENDPOINT)
+        AZURE_ML_KEY=$(AZURE_ML_KEY)
+        CONNECTION_STRING=$(CONNECTION_STRING)
+        DB_PATH=$(DB_PATH)
+        PYTHON_PATH=$(PYTHON_PATH)
+        SCM_DO_BUILD_DURING_DEPLOYMENT=$(SCM_DO_BUILD_DURING_DEPLOYMENT)
+        WEBSITE_RUN_FROM_PACKAGE=$(WEBSITE_RUN_FROM_PACKAGE)
+        WEBSITES_PORT=$(WEBSITES_PORT)
