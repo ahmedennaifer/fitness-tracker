@@ -54,7 +54,6 @@ steps:
   - script: |
       pip install pytest pytest-cov
       PYTHONPATH=$PYTHONPATH:$(System.DefaultWorkingDirectory)/src pytest src/backend/tests/ --cov=src/backend --cov-report=xml 
-      pytest src/backend/tests/ 
     displayName: 'Run Tests'
         
   - task: AzureWebApp@1
