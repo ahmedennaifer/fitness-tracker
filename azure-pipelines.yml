@@ -1,13 +1,44 @@
-
 trigger:
-- main
+  - main
 
 pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- task: AzureWebApp@1
-  inputs:
-    azureSubscription: 'fitness-tracker-connection'
-    appName: 'fitness-api-backed-001-ahmed2'
-    package: '$(System.DefaultWorkingDirectory)'
+  - checkout: self
+
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.10' 
+      addToPath: true
+
+  - script: |
+      python -m pip install --upgrade pip
+      pip install --no-cache-dir -r requirements.txt
+    displayName: 'Install Dependencies, no cache pour reinstaller'
+
+  
+  - script: |
+      pip install flake8
+      flake8 src/
+    displayName: 'Lint code (on peut faire avec ruff aussi)'
+
+  - script: |
+      set -x
+      echo "Starting deployment..."
+      pwd
+      ls -la
+      python -m pip install --no-cache-dir -r requirements.txt
+      echo "Dependencies installed"
+      cd src
+      echo "Changed directory"
+      ls -la
+      uvicorn backend.main:app --host 0.0.0.0 --port 8000
+    displayName: 'Run Backend'
+
+
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: 'fitness-tracker-connection'
+      appName: 'fitness-api-backed-001-ahmed2'
+      package: '$(System.DefaultWorkingDirectory)'
