@@ -16,18 +16,20 @@ provider "azurerm" {
   }
 }
 
+data "azurerm_client_config" "current" {}
+
 resource "azurerm_resource_group" "rg" {
-  name     = "fitness-tracker-rg-2"
-  location = "North Europe"
+  name     = var.resource_group_name
+  location = var.location
 }
 
 resource "azurerm_mssql_server" "sql" {
-  name                         = "fitness-sql-001"
+  name                         = var.sql_server_name
   resource_group_name          = azurerm_resource_group.rg.name
-  location                     = "North Europe"
+  location                     = var.location
   version                      = "12.0"
-  administrator_login          = "sqladmin"
-  administrator_login_password = "Testmdp1!"
+  administrator_login          = var.sql_admin_username
+  administrator_login_password = var.sql_admin_password
 
   depends_on = [azurerm_resource_group.rg]
 
@@ -39,14 +41,12 @@ resource "azurerm_mssql_server" "sql" {
 }
 
 resource "azurerm_mssql_database" "db" {
-  name         = "fitness-tracker-db-2"
+  name         = var.database_name
   server_id    = azurerm_mssql_server.sql.id
   collation    = "SQL_Latin1_General_CP1_CI_AS"
   license_type = "LicenseIncluded"
   max_size_gb  = 2
   sku_name     = "Basic"
-
-  depends_on = [azurerm_mssql_server.sql]
 }
 
 resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
@@ -56,19 +56,18 @@ resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
   end_ip_address   = "255.255.255.255"
 }
 
-
 resource "azurerm_service_plan" "plan" {
-  name                = "fitness-plan-001"
-  location            = azurerm_resource_group.rg.location
+  name                = var.app_service_plan_name
+  location            = var.location
   resource_group_name = azurerm_resource_group.rg.name
   os_type             = "Linux"
   sku_name            = "F1"
 }
 
 resource "azurerm_linux_web_app" "api" {
-  name                = "fitness-api-backed-001-ahmed2"
+  name                = var.web_app_name
   resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  location            = var.location
   service_plan_id     = azurerm_service_plan.plan.id
 
   site_config {
@@ -79,10 +78,9 @@ resource "azurerm_linux_web_app" "api" {
   }
 }
 
-
 resource "azurerm_key_vault" "kv" {
-  name                = "fitness-ml-kv-001"
-  location            = azurerm_resource_group.rg.location
+  name                = var.key_vault_name
+  location            = var.location
   resource_group_name = azurerm_resource_group.rg.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
   sku_name            = "standard"
@@ -102,49 +100,43 @@ resource "azurerm_key_vault_access_policy" "ml" {
   ]
 }
 
+resource "azurerm_application_insights" "appinsights" {
+  name                = var.app_insights_name
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  application_type    = "web"
+}
 
-data "azurerm_client_config" "current" {}
+resource "azurerm_storage_account" "storage" {
+  name                     = var.storage_account_name
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = var.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
 
 resource "azurerm_machine_learning_workspace" "ml" {
-  name                    = "fitness-ml-workspace"
-  location                = azurerm_resource_group.rg.location
-  resource_group_name     = azurerm_resource_group.rg.name
-  application_insights_id = azurerm_application_insights.appinsights.id
-  key_vault_id            = azurerm_key_vault.kv.id
-  storage_account_id      = azurerm_storage_account.storage.id
-
-  public_network_access_enabled = true # public access
+  name                          = var.ml_workspace_name
+  location                      = var.location
+  resource_group_name           = azurerm_resource_group.rg.name
+  application_insights_id       = azurerm_application_insights.appinsights.id
+  key_vault_id                  = azurerm_key_vault.kv.id
+  storage_account_id            = azurerm_storage_account.storage.id
+  public_network_access_enabled = true
 
   identity {
     type = "SystemAssigned"
   }
 }
 
-
-
-resource "azurerm_application_insights" "appinsights" {
-  name                = "fitness-insights-001"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  application_type    = "web"
-}
-
-resource "azurerm_storage_account" "storage" {
-  name                     = "fitnessmlstore001"
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
-
 resource "azurerm_monitor_action_group" "main" {
-  name                = "fitness-alert-group"
+  name                = var.action_group_name
   resource_group_name = azurerm_resource_group.rg.name
   short_name          = "fitnessag"
 }
 
 resource "azurerm_monitor_metric_alert" "api_response" {
-  name                = "api-response-time-alert"
+  name                = var.alert_name
   resource_group_name = azurerm_resource_group.rg.name
   scopes              = [azurerm_linux_web_app.api.id]
   description         = "Alert when API response time is too high"
@@ -162,16 +154,3 @@ resource "azurerm_monitor_metric_alert" "api_response" {
   }
 }
 
-output "app_insights_key" {
-  value     = azurerm_application_insights.appinsights.instrumentation_key
-  sensitive = true
-}
-
-output "app_insights_connection_string" {
-  value     = azurerm_application_insights.appinsights.connection_string
-  sensitive = true
-}
-
-output "storage_account_name" {
-  value = azurerm_storage_account.storage.name
-}
