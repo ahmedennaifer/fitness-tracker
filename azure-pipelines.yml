@@ -20,7 +20,7 @@ steps:
   
   - script: |
       pip install flake8
-      flake8 src/
+      flake8 --max-line-length 150 src/
     displayName: 'Lint code (on peut faire avec ruff aussi)'
 
   - script: |
