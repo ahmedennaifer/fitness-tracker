@@ -50,7 +50,12 @@ steps:
         src/**
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
       CleanTargetFolder: true
-    
+
+  - script: |
+      pip install pytest pytest-cov
+      pytest src/tests/ --cov=src/backend --cov-report=xml
+    displayName: 'Run Tests'
+        
   - task: AzureWebApp@1
     inputs:
       azureSubscription: 'fitness-tracker-connection'
