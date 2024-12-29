@@ -53,6 +53,8 @@ steps:
 
   - script: |
       pip install pytest pytest-cov
+      pip install fastapi==0.108.0  
+      pip install httpx==0.26.0     
       PYTHONPATH=$PYTHONPATH:$(System.DefaultWorkingDirectory)/src pytest src/backend/tests/ --cov=src/backend --cov-report=xml 
     displayName: 'Run Tests'
         
