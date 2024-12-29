@@ -28,7 +28,6 @@ steps:
       echo "Starting deployment..."
       pwd
       ls -la
-      python -m pip install --no-cache-dir -r requirements.txt
       echo "Dependencies installed"
       cd src
       echo "Changed directory"
