@@ -1,4 +1,3 @@
-"""
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -103,4 +102,3 @@ def test_send_health_metrics_invalid_data(sample_user):
 
 if __name__ == "__main__":
     pytest.main([__file__])
-"""
