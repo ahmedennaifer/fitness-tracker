@@ -33,7 +33,7 @@ steps:
       cd src
       echo "Changed directory"
       ls -la
-    displayName: 'Run Backend'
+    displayName: 'Extra checks and logs'
 
 
   - task: AzureWebApp@1
