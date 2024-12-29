@@ -19,9 +19,9 @@ steps:
 
   
   - script: |
-      pip install flake8
-      flake8 --max-line-length 150 src/
-    displayName: 'Lint code (on peut faire avec ruff aussi)'
+      pip install ruff
+      ruff format src/
+    displayName: 'Lint code'
 
   - script: |
       set -x
