@@ -40,4 +40,6 @@ steps:
       azureSubscription: 'fitness-tracker-connection'
       appName: 'fitness-api-backed-001-ahmed2'
       package: '$(System.DefaultWorkingDirectory)'
+      startUpCommand: 'python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000'
+
       
