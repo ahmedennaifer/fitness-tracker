@@ -65,11 +65,11 @@ steps:
       azureSubscription: 'fitness-tracker-connection'       
       appName: 'fitness-api-backed-001-ahmed2'       
       package: '$(Build.ArtifactStagingDirectory)'       
-      appSettings: |
-        -WEBSITE_RUN_FROM_PACKAGE 1
-        -APP_INSIGHTS_KEY $(APP_INSIGHTS_KEY)
-        -AZURE_ML_ENDPOINT $(AZURE_ML_ENDPOINT)
-        -AZURE_ML_KEY $(AZURE_ML_KEY)
-        -CONNECTION_STRING $(CONNECTION_STRING)
-        -DB_PATH $(DB_PATH)
+      appSettings: '-WEBSITE_RUN_FROM_PACKAGE 1'
       startUpCommand: 'pip install -r requirements.txt && cd src && python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000'
+    env:
+      APP_INSIGHTS_KEY: $(APP_INSIGHTS_KEY)
+      AZURE_ML_ENDPOINT: $(AZURE_ML_ENDPOINT)
+      AZURE_ML_KEY: $(AZURE_ML_KEY)
+      CONNECTION_STRING: $(CONNECTION_STRING)
+      DB_PATH: $(DB_PATH)
