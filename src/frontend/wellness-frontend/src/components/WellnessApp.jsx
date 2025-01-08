@@ -189,7 +189,7 @@ const MetricsPage = () => {
     fetchMetrics();
   }, [userEmail]);
 
-  const handleSubmit = async (e) => {
+   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!userEmail) {
       setMessage('Please register first');
@@ -197,53 +197,46 @@ const MetricsPage = () => {
     }
   
     try {
+      // First API call remains the same
       const response = await fetch(`${API_URL}/health_metrics/${userEmail}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(metrics)
       });
       const data = await response.json();
-  
-      const predResponse = await fetch(`${API_URL}/predict-wellness/1?email=${userEmail}`, {
-        method: 'POST'
-      });
-      const predData = await predResponse.json();
-      setWellnessScore(predData.pred);
+      
+      // Add error handling for the predict endpoint
+      try {
+        const predResponse = await fetch(`${API_URL}/predict-wellness/1?email=${userEmail}`, {
+          method: 'POST'
+        });
+        
+        if (!predResponse.ok) {
+          throw new Error('Prediction failed');
+        }
+        
+        const predData = await predResponse.json();
+        if (predData && predData.pred !== undefined) {
+          setWellnessScore(predData.pred);
+        } else {
+          setMessage('Unable to calculate wellness score');
+        }
+      } catch (predError) {
+        console.error('Prediction error:', predError);
+        setMessage('Unable to calculate wellness score');
+        // Don't set wellness score if there's an error
+        setWellnessScore(null);
+      }
+
       setMessage('Metrics submitted successfully');
       fetchMetrics();
     } catch (error) {
       console.error('Error:', error);
       setMessage('Error submitting metrics. Please try again.');
     }
-  };
+};
 
-  const handleDelete = async () => {
-    try {
-      const response = await fetch(`${API_URL}/health_metrics/${userEmail}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include'  
-      });
   
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-  
-      setMessage('Metrics deleted successfully');
-      setWellnessScore(null);
-      setMetrics({
-        steps: '',
-        calories_burnt_per_day: '',
-        sleep_hrs: ''
-      });
-      setHistoricalMetrics([]);
-    } catch (error) {
-      console.error('Error:', error);
-      setMessage('Error deleting metrics. Please try again.');
-    }
-  };
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-8">
       <div className="container-fluid px-4">
@@ -322,20 +315,19 @@ const MetricsPage = () => {
 
    
 {/* Right Column */}
-          <div className="space-y-8 w-full">
-            {wellnessScore !== null && (
-              <div className="bg-white rounded-xl shadow-lg p-8">
-                <h3 className="text-2xl font-semibold mb-6">Current Wellness Score</h3>
-                <div className="bg-blue-50 rounded-lg p-8 text-center">
-                  <div className="text-6xl font-bold text-blue-600">
-                    {wellnessScore.toFixed(1)}
-                  </div>
-                  <div className="text-gray-600 mt-2">out of 100</div>
-                </div>
-              </div>
-            )}
 
-            <div className="bg-white rounded-xl shadow-lg p-8">
+      {wellnessScore !== null && typeof wellnessScore !== 'undefined' && (
+  <div className="bg-white rounded-xl shadow-lg p-8">
+    <h3 className="text-2xl font-semibold mb-6">Current Wellness Score</h3>
+    <div className="bg-blue-50 rounded-lg p-8 text-center">
+      <div className="text-6xl font-bold text-blue-600">
+        {Number(wellnessScore).toFixed(1)}
+      </div>
+      <div className="text-gray-600 mt-2">out of 100</div>
+    </div>
+  </div>
+)}
+              <div className="bg-white rounded-xl shadow-lg p-8">
               <h3 className="text-2xl font-semibold mb-6">Activity Summary</h3>
               <div className="grid grid-cols-2 gap-8 w-full">
                 <div className="text-center p-6 bg-gray-50 rounded-lg">

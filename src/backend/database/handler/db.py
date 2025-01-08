@@ -36,6 +36,6 @@ def get_db():
 if __name__ == "__main__":
     from backend.database.models.models import User
 
-    with next(get_db()) as db:  # Extract the session
+    with next(get_db()) as db:
         users = db.query(User).all()
         print("Users:", users)
