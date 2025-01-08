@@ -56,12 +56,20 @@ steps:
       pip install fastapi==0.108.0  
       pip install httpx==0.26.0     
       PYTHONPATH=$PYTHONPATH:$(System.DefaultWorkingDirectory)/src pytest src/backend/tests/ --cov=src/backend --cov-report=xml 
+    env:
+      DB_PATH: $(DB_PATH)
     displayName: 'Run Tests'
         
-  - task: AzureWebApp@1
-    inputs:
-      azureSubscription: 'fitness-tracker-connection'
-      appName: 'fitness-api-backed-001-ahmed2'
-      package: '$(Build.ArtifactStagingDirectory)'
-      appSettings: '-WEBSITE_RUN_FROM_PACKAGE 1'
+  - task: AzureWebApp@1     
+    inputs:       
+      azureSubscription: 'fitness-tracker-connection'       
+      appName: 'fitness-api-backed-001-ahmed2'       
+      package: '$(Build.ArtifactStagingDirectory)'       
+      appSettings: |
+        -WEBSITE_RUN_FROM_PACKAGE 1
+        -APP_INSIGHTS_KEY $(APP_INSIGHTS_KEY)
+        -AZURE_ML_ENDPOINT $(AZURE_ML_ENDPOINT)
+        -AZURE_ML_KEY $(AZURE_ML_KEY)
+        -CONNECTION_STRING $(CONNECTION_STRING)
+        -DB_PATH $(DB_PATH)
       startUpCommand: 'pip install -r requirements.txt && cd src && python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000'
