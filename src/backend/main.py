@@ -48,10 +48,7 @@ app.add_middleware(
 
 @app.post("/predict-wellness/{metric_id}")
 async def predict_wellness(email: str, metric_id: int, db: Session = Depends(get_db)):
-    logger.info(
-        "Starting ML endpoint prediction",
-        extra={"email": email, "metric_id": metric_id},
-    )
+    print(f"Starting prediction for email: {email}, metric_id: {metric_id}")
 
     user = db.query(User).filter(User.email == email).first()
     if user:
@@ -60,35 +57,33 @@ async def predict_wellness(email: str, metric_id: int, db: Session = Depends(get
 
             data = {
                 "steps": metrics.steps,
-                "calories": metrics.calories_burnt_per_day,
+                "calories": metrics.calories,
                 "sleep_hours": metrics.sleep_hours,
             }
 
-            logger.info(
-                "Calling ML endpoint", extra={"user_id": user.id, "features": data}
-            )
+            print(f"Data to send: {data}")
 
             headers = {
                 "Authorization": f"Bearer {AZURE_ML_KEY}",
                 "Content-Type": "application/json",
             }
 
+            print(f"Making request to: {AZURE_ML_ENDPOINT}")
+            print(f"Headers: {headers}")
+
             response = requests.post(AZURE_ML_ENDPOINT, json=data, headers=headers)
+
+            print(f"Response status: {response.status_code}")
+            print(f"Response text: {response.text}")
+
             prediction = response.json()
 
             if "error" in prediction:
-                logger.error(
-                    "ML endpoint returned error",
-                    extra={"error": prediction["error"], "user_id": user.id},
-                )
                 raise HTTPException(status_code=500, detail=prediction["error"])
 
             pred = prediction["prediction"]
 
-            logger.info(
-                "ML prediction successful",
-                extra={"user_id": user.id, "prediction": pred, "features": data},
-            )
+            print(f"Got prediction: {pred}")
 
             metrics.wellness_score = pred
             db.commit()
@@ -96,18 +91,10 @@ async def predict_wellness(email: str, metric_id: int, db: Session = Depends(get
             return {"pred": pred}
 
         except Exception as e:
-            logger.error(
-                "Prediction failed",
-                extra={
-                    "error": str(e),
-                    "user_id": user.id if user else None,
-                    "email": email,
-                },
-            )
+            print(f"Error occurred: {str(e)}")
             db.rollback()
             raise HTTPException(status_code=500, detail=str(e))
     else:
-        logger.error("User not found", extra={"email": email})
         raise HTTPException(status_code=404, detail="User not found")
 
 
