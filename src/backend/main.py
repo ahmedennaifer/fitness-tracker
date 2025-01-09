@@ -39,7 +39,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -58,7 +58,6 @@ async def predict_wellness(email: str, metric_id: int, db: Session = Depends(get
         try:
             metrics = db.query(Metric).filter(Metric.user_id == user.id).first()
 
-            # Prepare data for ML endpoint
             data = {
                 "steps": metrics.steps,
                 "calories": metrics.calories,
@@ -74,7 +73,6 @@ async def predict_wellness(email: str, metric_id: int, db: Session = Depends(get
                 "Content-Type": "application/json",
             }
 
-            # Call Azure ML endpoint
             response = requests.post(AZURE_ML_ENDPOINT, json=data, headers=headers)
             prediction = response.json()
 

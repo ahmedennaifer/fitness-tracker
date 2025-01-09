@@ -255,17 +255,24 @@ const MetricsPage = () => {
 
       // 2) Attempt to get a wellness prediction after saving metrics
       try {
-        const predResponse = await fetch(
-          // Make sure `/predict-wellness/1?email=...` is correct for your backend
-          `${API_URL}/predict-wellness/1?email=${userEmail}`,
-          {
-            method: 'POST'
-          }
-        );
 
-        if (!predResponse.ok) {
-          throw new Error('Prediction failed');
-        }
+        
+                
+                        const predResponse = await fetch(
+  `${API_URL}/predict-wellness/1?email=${userEmail}`,
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      steps: metrics.steps,
+      calories: Number(metrics.calories_burnt_per_day),
+      sleep_hours: Number(metrics.sleep_hrs)
+    })
+  }
+);
+                                        
 
         const predData = await predResponse.json();
         if (predData && predData.pred !== undefined) {
