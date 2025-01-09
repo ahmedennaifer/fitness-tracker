@@ -60,7 +60,7 @@ async def predict_wellness(email: str, metric_id: int, db: Session = Depends(get
 
             data = {
                 "steps": metrics.steps,
-                "calories": metrics.calories,
+                "calories": metrics.calories_burnt_per_day,
                 "sleep_hours": metrics.sleep_hours,
             }
 
